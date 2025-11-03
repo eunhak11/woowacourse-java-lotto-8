@@ -3,6 +3,8 @@ package lotto.controller;
 import lotto.Lotto;
 import lotto.domain.LottoGenerator;
 import lotto.domain.LottoMachine;
+import lotto.domain.LottoStatistics;
+import lotto.domain.ProfitCalculator;
 import lotto.domain.WinningNumbers;
 import lotto.util.NumberParser;
 import lotto.validator.PurchaseAmountValidator;
@@ -23,6 +25,7 @@ public class LottoController {
         List<Lotto> lottos = purchaseLottos(purchaseAmount);
         displayLottos(lottos);
         WinningNumbers winningNumbers = getWinningNumbers();
+        displayResults(lottos, winningNumbers, purchaseAmount);
     }
 
     private int getPurchaseAmount() {
@@ -65,5 +68,16 @@ public class LottoController {
 
     private int getBonusNumber() {
         return InputView.readBonusNumber();
+    }
+
+    private void displayResults(List<Lotto> lottos, WinningNumbers winningNumbers, int purchaseAmount) {
+        LottoStatistics statistics = new LottoStatistics(lottos, winningNumbers);
+        double profitRate = calculateProfitRate(statistics, purchaseAmount);
+        OutputView.printStatistics(statistics, profitRate);
+    }
+
+    private double calculateProfitRate(LottoStatistics statistics, int purchaseAmount) {
+        long totalPrize = statistics.getTotalPrize();
+        return ProfitCalculator.calculateProfitRate(totalPrize, purchaseAmount);
     }
 }
